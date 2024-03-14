@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
@@ -11,6 +12,17 @@ class Image(models.Model):
 		db_table = "images"
 		verbose_name = "Image"
 		verbose_name_plural = "Images"
+
+
+class Rating(models.Model):
+	""" Model for rating"""
+
+	user = models.ForeignKey(User, related_name='ratings', on_delete=models.CASCADE)
+
+	class Meta:
+		db_table = "ratings"
+		verbose_name = "Rating"
+		verbose_name_plural = "Ratings"
 
 
 class School(models.Model):
@@ -108,7 +120,7 @@ class Discussion(models.Model):
 	created_at = models.DateTimeField("Created At", default=timezone.now)
 	is_closed = models.BooleanField("Is closed", default=False)
 	lesson_type = models.CharField("Lesson Type", max_length=20, choices=lesson_type_choices, blank=True)
-	rating = models.IntegerField("Rating", default=0)
+	rating = models.ManyToManyField(Rating, related_name='discussions_ratings', blank=True)
 	photos = models.ManyToManyField(Image, related_name='discussions_photos', blank=True)
 
 	class Meta:
@@ -123,7 +135,7 @@ class Comment(models.Model):
 	user = models.ForeignKey("""Todo: Create User model""", related_name='comments', on_delete=models.CASCADE)
 	discussion = models.ForeignKey(Discussion, related_name='discussions', on_delete=models.CASCADE)
 	created_at = models.DateTimeField("Created At", default=timezone.now)
-	rating = models.IntegerField("Rating", default=0)
+	rating = models.ManyToManyField(Rating, related_name='comments_ratings', blank=True)
 	content = models.TextField("Content", max_length=1000)
 	photos = models.ManyToManyField(Image, related_name='comments_photos', blank=True)
 
