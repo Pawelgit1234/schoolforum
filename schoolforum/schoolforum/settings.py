@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     # My apps
     "schools",
+    "user",
+    "utils",
 ]
 
 MIDDLEWARE = [
