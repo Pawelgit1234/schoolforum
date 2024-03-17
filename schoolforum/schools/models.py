@@ -13,6 +13,9 @@ class Image(models.Model):
         verbose_name = "Image"
         verbose_name_plural = "Images"
 
+    def __str__(self):
+        return self.image.url
+
 
 class Rating(models.Model):
     """ Model for rating"""
@@ -23,6 +26,9 @@ class Rating(models.Model):
         db_table = "ratings"
         verbose_name = "Rating"
         verbose_name_plural = "Ratings"
+
+    def __str__(self):
+        return self.user.username
 
 
 class School(models.Model):
@@ -55,6 +61,9 @@ class School(models.Model):
         db_table = "schools"
         verbose_name = "School"
         verbose_name_plural = "Schools"
+
+    def __str__(self):
+        return self.name
 
 
 class Discussion(models.Model):
@@ -127,6 +136,9 @@ class Discussion(models.Model):
         verbose_name = "Discussion"
         verbose_name_plural = "Discussions"
 
+    def __str__(self):
+        return self.title
+
 
 class Comment(models.Model):
     """ For discussions """
@@ -141,3 +153,6 @@ class Comment(models.Model):
         db_table = "comments"
         verbose_name = "Comment"
         verbose_name_plural = "Comments"
+
+    def __str__(self):
+        return self.content[:10]
