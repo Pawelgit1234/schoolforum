@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
+<br>
 <div class="row">
     {% for school in schools %}
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <img src="{% if school.photos.all %}{{ school.photos.first.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="School Image">
-            <div class="card-body">
-                <h5 class="card-title">{{ school.name }}</h5>
-                <p class="card-text">
-                    {% if school.description|length > 100 %}
-                        {{ school.description|truncatechars:100 }}
-                        <span id="more_text_{{ school.id }}" style="display: none;">{{ school.description|slice:":100" }}</span>
-                    {% else %}
-                        {{ school.description }}
-                    {% endif %}
-                </p>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Country:</strong> {{ school.country }}</li>
-                    <li class="list-group-item"><strong>City:</strong> {{ school.city }}</li>
-                    <li class="list-group-item"><strong>Education Level:</strong> {{ school.get_education_level_display }}</li>
-                    <!-- Add more fields here as needed -->
-                </ul>
+    <div class="col-md-6 mb-4">
+        <a href="{% url 'school' school.name %}" class="text-decoration-none">
+            <div class="card mx-4">
+                <img src="{% if school.photos.all %}{{ school.photos.first.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="School Image">
+                <div class="card-body">
+                    <h5 class="card-title">{{ school.name }}</h5>
+                    <p class="card-text">
+                        {% if school.description|length > 100 %}
+                            {{ school.description|truncatechars:100 }}
+                            <span id="more_text_{{ school.id }}" style="display: none;">{{ school.description|slice:":100" }}</span>
+                        {% else %}
+                            {{ school.description }}
+                        {% endif %}
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
+    {% if forloop.counter|divisibleby:2 %}
+    <div class="w-100"></div>
+    {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

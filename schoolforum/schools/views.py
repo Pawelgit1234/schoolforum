@@ -6,3 +6,8 @@ from .models import School
 def home(request):
 	schools = School.objects.all()
 	return render(request, "schools/home.html", {"schools": schools})
+
+
+def school(request, slug):
+	schools = School.objects.all()
+	return render(request, "schools/home.html", {"schools": schools})
