@@ -3,6 +3,6 @@
         object-fit: cover;
     }
 
-.card:hover {
+.home-card:hover {
         border: 2px solid #007bff;
     }

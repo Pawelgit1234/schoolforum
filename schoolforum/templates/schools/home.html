@@ -4,8 +4,8 @@
 <div class="row">
     {% for school in schools %}
     <div class="col-md-6 mb-4">
-        <a href="{% url 'school' school.name %}" class="text-decoration-none">
-            <div class="card mx-4">
+        <a href="{% url 'school' school.slug %}" class="text-decoration-none">
+            <div class="card home-card mx-4">
                 <img src="{% if school.photos.all %}{{ school.photos.first.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="School Image">
                 <div class="card-body">
                     <h5 class="card-title">{{ school.name }}</h5>

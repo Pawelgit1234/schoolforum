@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+{% load converters %}
+{% block content %}
+<br>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title"><b>{{ school.name }}</b></h1>
+                    <p class="card-text">{{ school.description }}</p>
+                    <p class="card-text"><img src="{% static 'img/location.svg' %}" width="30"> {{ school.street }} {{ school.house_number }}, {{ school.country }}, {{ school.city }}
+                        (<a href="https://www.google.com/maps?q={{ school.latitude }},{{ school.longitude }}" target="_blank" class="no-underline">{{ school.latitude|dms }} {{ school.longitude|dms }}</a>)</p>
+                    <p class="card-text"><img src="{% static 'img/phone.svg' %}" width="20"> <span class="copyable" data-text="{{ school.phone_number }}">{{ school.phone_number }}</span></p>
+                    <p class="card-text"><img src="{% static 'img/email.svg' %}" width="30"> <span class="copyable" data-text="{{ school.email }}">{{ school.email }}</span></p>
+                    <p class="card-text"><img src="{% static 'img/website.svg' %}" width="30"> <a href="{{ school.website }}" class="no-underline">{{ school.website }}</a></p>
+                    <p class="card-text"><img src="{% static 'img/school.svg' %}" width="30"> {{ school.get_education_level_display }}</p>
+                    <p class="card-text"><img src="{% static 'img/calender.svg' %}" width="30"> {{ school.foundation_date }}</p>
+                    {% if school.photos %}
+                        <div class="col-md-4" style="position: relative;" onclick="showGallery()">
+                            <img src="{{ school.photos.first.image.url }}" class="img-fluid" style="border-radius: 10px;" alt="School Photo">
+                            <span class="photo-count">{{ school.photos.count }} Photo{% if school.photos.count > 1 %}s{% endif %}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if school.school_discussions.all %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        {% for discussion in school.school_discussions.all %}
+        <div class="col-md-12 mb-4">
+            <div class="card {% if discussion.is_closed %}closed-discussion{% endif %}">
+                <div class="card-body">
+                    <p class="card-text">
+                        <img src="{{ discussion.user.profile.avatar.url }}" alt="Avatar" width="30" height="30" style="border-radius: 50%;">
+                        {{ discussion.user }}
+                        <img src="{% static 'img/clock.svg' %}" width="20">
+                        {{ discussion.created_at|date:"d.m.Y H:i" }}
+                        <img src="{% static 'img/book.svg' %}" width="20">
+                        {{ discussion.get_lesson_type_display }}
+                        <img src="{% static 'img/star_full.svg' %}" width="20">
+                        {{ discussion.overall_rating_balance }}
+                        <img src="{% static 'img/comment.svg' %}" width="20">
+                        {{ discussion.discussion_comments.all.count }}
+                    </p>
+                    <h2 class="card-title">{{ discussion.title }}</h2>
+                </div>
+                {% if discussion.is_closed %}
+                <div class="closed-indicator"></div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div id="overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none;">
+    <span id="prevButton" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); cursor: pointer; color: white; font-size: 32px;" onclick="imgBack()">&lt;</span>
+    <img id="galleryImage" src="{{ school.photos.first.image.url }}" style="max-width: calc(100% - 60px); max-height: 100%; margin: auto; display: block;">
+    <span id="nextButton" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: white; font-size: 32px;" onclick="imgForward()">&gt;</span>
+</div>
+
+<script>
+    const images = [
+    {% for photo in school.photos.all %}
+        "{{ photo.image.url }}",
+    {% endfor %}
+];
+</script>
+
+{% endblock %}

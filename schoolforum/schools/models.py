@@ -1,6 +1,9 @@
+import unidecode
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 class Image(models.Model):
@@ -21,6 +24,7 @@ class Rating(models.Model):
     """ Model for rating"""
 
     user = models.ForeignKey(User, related_name='ratings', on_delete=models.CASCADE)
+    is_plus = models.BooleanField(default=False, null=True, blank=True)
 
     class Meta:
         db_table = "ratings"
@@ -43,19 +47,19 @@ class School(models.Model):
 
     name = models.CharField("Name", max_length=50)
     description = models.TextField("Description", max_length=500)
-    latitude = models.DecimalField("Latitude", max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField("Longitude", max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField("Latitude", max_digits=9, decimal_places=3, null=True, blank=True)
+    longitude = models.DecimalField("Longitude", max_digits=9, decimal_places=3, null=True, blank=True)
     country = models.CharField("Country", max_length=100)
     city = models.CharField("City", max_length=100)
     street = models.CharField("Street", max_length=100)
     house_number = models.CharField("House Number", max_length=20, blank=True)
-    postal_code = models.CharField("Postal Code", max_length=20, blank=True)
     phone_number = models.CharField("Phone Number", max_length=20, blank=True)
     email = models.EmailField("Email", max_length=254, blank=True)
     website = models.URLField("Website", max_length=200, blank=True)
     education_level = models.CharField("Education Level", max_length=20, choices=education_level_choices, blank=True)
     foundation_date = models.DateField("Foundation Date", null=True, blank=True)
     photos = models.ManyToManyField(Image, related_name='schools_photos', blank=True)
+    slug = models.SlugField("Slug", max_length=100, unique=True, blank=True)
 
     class Meta:
         db_table = "schools"
@@ -64,6 +68,10 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unidecode.unidecode(self.name))
+        super().save(*args, **kwargs)
 
 
 class Discussion(models.Model):
@@ -135,6 +143,11 @@ class Discussion(models.Model):
         db_table = "discussions"
         verbose_name = "Discussion"
         verbose_name_plural = "Discussions"
+
+    def overall_rating_balance(self):
+        positive_count = self.ratings.filter(is_plus=True).count()
+        negative_count = self.ratings.filter(is_plus=False).count()
+        return positive_count - negative_count
 
     def __str__(self):
         return self.title
