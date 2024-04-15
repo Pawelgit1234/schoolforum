@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% load static %}
 {% load converters %}
+
+{% block js %}
+    <script src="{% static 'js/school.js' %}"></script>
+{% endblock %}
+
+{% block css %}
+    <link href="{% static 'css/school.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <br>
 <div class="container">
