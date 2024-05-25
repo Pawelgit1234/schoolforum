@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 
-from .models import School
+from .models import School, Discussion
 
 
 def home(request):
@@ -34,3 +34,43 @@ def load_more_schools(request):
 def school(request, slug):
 	school = get_object_or_404(School, slug=slug)
 	return render(request, "schools/school.html", {"school": school})
+
+
+def load_more_discussions(request, slug):
+	try:
+		offset = int(request.GET.get('offset', 0))
+	except ValueError:
+		offset = 0
+	school = get_object_or_404(School, slug=slug)
+
+	serialized_discussions = []
+	for d in school.school_discussions.all()[offset:offset+10]:
+		overall_rating = d.overall_rating_balance()
+		comments_count = d.discussion_comments.count()
+
+		serialized_discussion = {
+			'user': d.user.username,
+			'avatar_url': d.user.profile.avatar.url,
+			'creation_date': d.created_at.strftime('%d.%m.%Y %H:%M'),
+			'type': d.get_lesson_type_display(),
+			'rating': overall_rating,
+			'comments_count': comments_count,
+			'title': d.title,
+		}
+
+		serialized_discussions.append(serialized_discussion)
+	return JsonResponse(serialized_discussions, safe=False)
+
+
+def search(request):
+	query = request.GET.get('q')
+	schools = School.objects.filter(name__icontains=query)
+	discussions = Discussion.objects.filter(title__icontains=query)
+
+	context = {
+		'schools': schools,
+		'discussions': discussions,
+		'query': query,
+	}
+
+	return render(request, 'search_results.html', context)

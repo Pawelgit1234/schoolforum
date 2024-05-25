@@ -40,8 +40,8 @@
 
 {% if school.school_discussions.all %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        {% for discussion in school.school_discussions.all %}
+    <div class="row justify-content-center discussions-container">
+        {% for discussion in school.school_discussions.all|slice:"0:10" %}
         <div class="col-md-12 mb-4">
             <div class="card {% if discussion.is_closed %}closed-discussion{% endif %}">
                 <div class="card-body">
@@ -76,11 +76,17 @@
 </div>
 
 <script>
+    let url = '{% url "load_more_discussions" school.slug %}' + '?offset=';
+    let clock = "{% static 'img/clock.svg' %}";
+    let book = "{% static 'img/book.svg' %}";
+    let star_full = "{% static 'img/star_full.svg' %}";
+    let comment = "{% static 'img/comment.svg' %}";
+
     const images = [
-    {% for photo in school.photos.all %}
-        "{{ photo.image.url }}",
-    {% endfor %}
-];
+        {% for photo in school.photos.all %}
+            "{{ photo.image.url }}",
+        {% endfor %}
+    ];
 </script>
 
 {% endblock %}
