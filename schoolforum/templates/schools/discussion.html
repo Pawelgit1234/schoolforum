@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block js %}
+<script src="{% static 'js/discussion.js' %}"></script>
+{% endblock %}
+
+{% block css %}
+<link href="{% static 'css/discussion.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card {% if discussion.is_closed %}closed-discussion{% endif %}">
+                <div class="card-body">
+                     <p class="card-text">
+                        <img src="{{ discussion.user.profile.avatar.url }}" alt="Avatar" width="30" height="30" style="border-radius: 50%;">
+                        {{ discussion.user.username }}
+                         <img src="{% static 'img/clock.svg' %}" width="20">
+                        <span>{{ discussion.created_at }}</span>
+                         <img src="{% static 'img/book.svg' %}" width="20">
+                        <span>{{ discussion.get_lesson_type_display }}</span>
+                    </p>
+                    <h2 class="card-title">{{ discussion.title }}</h2>
+                    <p class="card-text">{{ discussion.content }}</p>
+                    {% if discussion.photos.count != 0 %}
+                        <div class="col-md-4" style="position: relative;" onclick="showGallery()">
+                            <img src="{{ discussion.photos.first.image.url }}" class="img-fluid" style="border-radius: 10px;" alt="School Photo">
+                            <span class="photo-count">{{ discussion.photos.count }} Photo{% if discussion.photos.count > 1 %}s{% endif %}</span>
+                        </div>
+                    {% endif %}
+
+                    {% if discussion %}
+                        <img src="{% static 'img/star_full.svg' %}" width="30" class="star-rating star-full">
+                    {% else %}
+                        <img src="{% static 'img/star_empty.svg' %}" width="30" class="star-rating star-empty">
+                    {% endif %}
+
+                    <p>{{ discussion.discussion_comments.all.count }} Comment{% if discussion.discussion_comments.all.count > 1 %}s{% endif %}</p>
+                    <div class="discussion-comments">
+                        {% for comment in discussion.discussion_comments.all %}
+                        <div class="comment">
+                            <p>{{ comment.user.username }}: {{ comment.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if discussion.is_closed %}
+                <div class="closed-indicator"></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none;">
+    <span id="prevButton" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); cursor: pointer; color: white; font-size: 32px;" onclick="imgBack()">&lt;</span>
+    <img id="galleryImage" src="{{ discussion.photos.first.image.url }}" style="max-width: calc(100% - 60px); max-height: 100%; margin: auto; display: block;">
+    <span id="nextButton" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: white; font-size: 32px;" onclick="imgForward()">&gt;</span>
+</div>
+
+<script>
+    let url = '{% url "load_more_comments" discussion.id %}' + '?offset=';
+
+    const images = [
+        {% for photo in discussion.photos.all %}
+            "{{ photo.image.url }}",
+        {% endfor %}
+    ];
+</script>
+
+{% endblock %}

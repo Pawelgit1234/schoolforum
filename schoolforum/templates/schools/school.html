@@ -26,7 +26,7 @@
                     <p class="card-text"><img src="{% static 'img/website.svg' %}" width="30"> <a href="{{ school.website }}" class="no-underline">{{ school.website }}</a></p>
                     <p class="card-text"><img src="{% static 'img/school.svg' %}" width="30"> {{ school.get_education_level_display }}</p>
                     <p class="card-text"><img src="{% static 'img/calender.svg' %}" width="30"> {{ school.foundation_date }}</p>
-                    {% if school.photos %}
+                    {% if school.photos.count != 0  %}
                         <div class="col-md-4" style="position: relative;" onclick="showGallery()">
                             <img src="{{ school.photos.first.image.url }}" class="img-fluid" style="border-radius: 10px;" alt="School Photo">
                             <span class="photo-count">{{ school.photos.count }} Photo{% if school.photos.count > 1 %}s{% endif %}</span>
@@ -57,7 +57,7 @@
                         <img src="{% static 'img/comment.svg' %}" width="20">
                         {{ discussion.discussion_comments.all.count }}
                     </p>
-                    <h2 class="card-title">{{ discussion.title }}</h2>
+                    <a href="{% url 'discussion' discussion.id %}" class="no-underline"><h2 class="card-title">{{ discussion.title }}</h2></a>
                 </div>
                 {% if discussion.is_closed %}
                 <div class="closed-indicator"></div>

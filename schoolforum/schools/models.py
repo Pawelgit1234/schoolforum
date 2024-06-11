@@ -161,6 +161,7 @@ class Comment(models.Model):
     ratings = models.ManyToManyField(Rating, related_name='comment_ratings', blank=True)
     content = models.TextField("Content", max_length=1000)
     photos = models.ManyToManyField(Image, related_name='comment_photos', blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
 
     class Meta:
         db_table = "comments"

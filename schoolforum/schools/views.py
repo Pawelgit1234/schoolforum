@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST, require_GET
 
 from .models import School, Discussion
 
@@ -56,6 +58,7 @@ def load_more_discussions(request, slug):
 			'rating': overall_rating,
 			'comments_count': comments_count,
 			'title': d.title,
+			'id': d.id,
 		}
 
 		serialized_discussions.append(serialized_discussion)
@@ -73,4 +76,25 @@ def search(request):
 		'query': query,
 	}
 
-	return render(request, 'search_results.html', context)
+	return render(request, 'schools/search_results.html', context)
+
+
+def discussion(request, id):
+	dis = get_object_or_404(Discussion, id=id)
+	return render(request, "schools/discussion.html", {"discussion": dis})
+
+
+@require_POST
+@login_required
+def change_discussion_rating(request, slug):
+	pass
+
+
+@require_POST
+@login_required
+def change_comment_rating(request, id):
+	pass
+
+
+def load_more_comments(request, id):
+	return None
