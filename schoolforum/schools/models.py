@@ -22,9 +22,9 @@ class Image(models.Model):
 
 class Rating(models.Model):
     """ Model for rating"""
-
     user = models.ForeignKey(User, related_name='ratings', on_delete=models.CASCADE)
-    is_plus = models.BooleanField(default=False, null=True, blank=True)
+    discussion = models.ForeignKey('Discussion', related_name='discussion_ratings', on_delete=models.CASCADE)
+    is_plus = models.BooleanField(null=True, blank=True)  # Allow null for no vote
 
     class Meta:
         db_table = "ratings"
@@ -32,7 +32,7 @@ class Rating(models.Model):
         verbose_name_plural = "Ratings"
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {'Upvote' if self.is_plus else 'Downvote' if self.is_plus is not None else 'No vote'}"
 
 
 class School(models.Model):

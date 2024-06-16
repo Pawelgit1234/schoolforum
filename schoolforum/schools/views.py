@@ -2,11 +2,14 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import School, Discussion
+import json
+
+from .models import School, Discussion, Rating
 
 
-def home(request):
+def home_view(request):
 	schools = School.objects.all()[:10]
 	return render(request, "schools/home.html", {"schools": schools})
 
@@ -33,7 +36,7 @@ def load_more_schools(request):
 	return JsonResponse(serialized_schools, safe=False)
 
 
-def school(request, slug):
+def school_view(request, slug):
 	school = get_object_or_404(School, slug=slug)
 	return render(request, "schools/school.html", {"school": school})
 
@@ -79,20 +82,51 @@ def search(request):
 	return render(request, 'schools/search_results.html', context)
 
 
-def discussion(request, id):
-	dis = get_object_or_404(Discussion, id=id)
-	return render(request, "schools/discussion.html", {"discussion": dis})
+def discussion_view(request, id):
+	discussion = get_object_or_404(Discussion, id=id)
+	user = request.user
+
+	arrow_up = discussion.ratings.filter(user=user, is_plus=True).exists()
+	arrow_down = discussion.ratings.filter(user=user, is_plus=False).exists()
+
+	context = {
+		'discussion': discussion,
+		'arrow_up': not arrow_up,
+		'arrow_down': not arrow_down,
+	}
+
+	return render(request, 'schools/discussion.html', context)
 
 
 @require_POST
 @login_required
-def change_discussion_rating(request, slug):
-	pass
+@csrf_exempt
+def change_discussion_rating(request):
+	data = json.loads(request.body)
+	discussion_id = data.get('id')
+	is_up_arrow = data.get('is_up_arrow')
+
+	discussion = get_object_or_404(Discussion, id=discussion_id)
+	user = request.user
+
+	rating, created = Rating.objects.get_or_create(user=user, discussion=discussion)
+
+	if rating.is_plus == is_up_arrow:
+		rating.is_plus = None
+		rating.save()
+	else:
+		rating.is_plus = is_up_arrow
+		rating.save()
+
+	new_rating_balance = discussion.overall_rating_balance()
+
+	return JsonResponse({'status': 'success', 'new_rating': str(new_rating_balance), 'is_up': rating.is_plus})
 
 
 @require_POST
 @login_required
-def change_comment_rating(request, id):
+@csrf_exempt
+def change_comment_rating(request):
 	pass
 
 

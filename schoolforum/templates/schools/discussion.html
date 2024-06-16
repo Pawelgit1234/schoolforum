@@ -31,12 +31,11 @@
                             <span class="photo-count">{{ discussion.photos.count }} Photo{% if discussion.photos.count > 1 %}s{% endif %}</span>
                         </div>
                     {% endif %}
-
-                    {% if discussion %}
-                        <img src="{% static 'img/star_full.svg' %}" width="30" class="star-rating star-full">
-                    {% else %}
-                        <img src="{% static 'img/star_empty.svg' %}" width="30" class="star-rating star-empty">
-                    {% endif %}
+                    <h3>
+                        <img id="up-arrow" src="{% static arrow_up|yesno:'img/arrow_up.svg,img/arrow_up_black.svg' %}" alt="up" width="20px" onclick="change_discussion_rating({{ discussion.id }}, true)">
+                        <span id="rating-balance">{{ discussion.overall_rating_balance }}</span>
+                        <img id="down-arrow" src="{% static arrow_down|yesno:'img/arrow_down.svg,img/arrow_down_black.svg' %}" alt="down" width="20px" onclick="change_discussion_rating({{ discussion.id }}, false)">
+                    </h3>
 
                     <p>{{ discussion.discussion_comments.all.count }} Comment{% if discussion.discussion_comments.all.count > 1 %}s{% endif %}</p>
                     <div class="discussion-comments">
@@ -63,6 +62,13 @@
 
 <script>
     let url = '{% url "load_more_comments" discussion.id %}' + '?offset=';
+    let discussion_rating_url = '{% url "discussion_rating" %}';
+    let comment_rating_url = '{% url "comment_rating" %}';
+
+    let arrow_down_black = '{% static "img/arrow_down_black.svg" %}';
+    let arrow_down = '{% static "img/arrow_down.svg" %}';
+    let arrow_up_black = '{% static "img/arrow_up_black.svg" %}';
+    let arrow_up = '{% static "img/arrow_up.svg" %}';
 
     const images = [
         {% for photo in discussion.photos.all %}
