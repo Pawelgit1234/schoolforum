@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import json
 
-from .models import School, Discussion, Rating
+from .models import School, Discussion, Rating, Comment
 
 
 def home_view(request):
@@ -123,12 +123,32 @@ def change_discussion_rating(request):
 	return JsonResponse({'status': 'success', 'new_rating': str(new_rating_balance), 'is_up': rating.is_plus})
 
 
-@require_POST
-@login_required
-@csrf_exempt
-def change_comment_rating(request):
-	pass
-
-
 def load_more_comments(request, id):
-	return None
+	offset = int(request.GET.get('offset', 0))
+	limit = 10
+	comments = Comment.objects.filter(discussion_id=id, parent=None).order_by('created_at')[offset:offset+limit]
+	comments_data = []
+
+	for comment in comments:
+		replies = comment.replies.all()
+		replies_data = [
+			{
+				'id': reply.id,
+				'user': reply.user.username,
+				'avatar': reply.user.profile.avatar.url,
+				'created_at': reply.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+				'content': reply.content,
+				'photos': [photo.image.url for photo in reply.photos.all()]
+			} for reply in replies
+		]
+		comments_data.append({
+			'id': comment.id,
+			'user': comment.user.username,
+			'avatar': comment.user.profile.avatar.url,
+			'created_at': comment.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+			'content': comment.content,
+			'replies': replies_data,
+			'photos': [photo.image.url for photo in comment.photos.all()]
+		})
+
+	return JsonResponse(comments_data, safe=False)

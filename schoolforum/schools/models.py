@@ -158,7 +158,6 @@ class Comment(models.Model):
     user = models.ForeignKey(User, related_name='commented_discussions', on_delete=models.CASCADE)
     discussion = models.ForeignKey(Discussion, related_name='discussion_comments', on_delete=models.CASCADE)
     created_at = models.DateTimeField("Created At", default=timezone.now)
-    ratings = models.ManyToManyField(Rating, related_name='comment_ratings', blank=True)
     content = models.TextField("Content", max_length=1000)
     photos = models.ManyToManyField(Image, related_name='comment_photos', blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')

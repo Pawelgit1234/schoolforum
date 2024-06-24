@@ -10,6 +10,5 @@ urlpatterns = [
     path('load_more_discussions/<slug:slug>', views.load_more_discussions, name='load_more_discussions'),
     path('discussion/<int:id>', views.discussion_view, name='discussion'),
     path('discussion_rating/', views.change_discussion_rating, name="discussion_rating"),
-    path('comment_rating/', views.change_comment_rating, name="comment_rating"),
     path('load_more_comments/<int:id>', views.load_more_comments, name='load_more_comments'),
 ]

@@ -39,11 +39,7 @@
 
                     <p>{{ discussion.discussion_comments.all.count }} Comment{% if discussion.discussion_comments.all.count > 1 %}s{% endif %}</p>
                     <div class="discussion-comments">
-                        {% for comment in discussion.discussion_comments.all %}
-                        <div class="comment">
-                            <p>{{ comment.user.username }}: {{ comment.content }}</p>
-                        </div>
-                        {% endfor %}
+                        <!--Discussion comments-->
                     </div>
                 </div>
                 {% if discussion.is_closed %}
@@ -61,9 +57,8 @@
 </div>
 
 <script>
-    let url = '{% url "load_more_comments" discussion.id %}' + '?offset=';
+    let load_more_comments_url = '{% url "load_more_comments" discussion.id %}' + '?offset=';
     let discussion_rating_url = '{% url "discussion_rating" %}';
-    let comment_rating_url = '{% url "comment_rating" %}';
 
     let arrow_down_black = '{% static "img/arrow_down_black.svg" %}';
     let arrow_down = '{% static "img/arrow_down.svg" %}';
