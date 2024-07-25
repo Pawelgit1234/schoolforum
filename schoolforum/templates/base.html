@@ -25,7 +25,7 @@
         <a class="nav-link disabled" aria-disabled="true">Disabled</a>
       </div>
       <form class="d-flex ms-auto" method="GET" action="{% url 'search' %}">
-        <input class="form-control me-2" type="search" placeholder="Search schools and posts" aria-label="Search" name="q">
+        <input class="form-control me-2" type="search" placeholder="Search schools and posts" aria-label="Search" name="q" {% if query %}value="{{ query }}"{%endif%}>
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
     </div>

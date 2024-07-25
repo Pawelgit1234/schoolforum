@@ -45,9 +45,34 @@ function updateDiscussionArrowDisplay(is_up) {
 
 let offset = 0;
 
+all_comments_photos = {}; // comment_id : gallery
+
+class Gallery {
+    constructor(photos_urls) {
+        this.photos_urls = photos_urls;
+        this.index = 0;
+    }
+
+    getCurrentPhoto() {
+        return this.photos_urls[this.index];
+    }
+
+    nextPhoto() {
+        this.index = (this.index + 1) % this.photos_urls.length;
+        return this.getCurrentPhoto();
+    }
+
+    prevPhoto() {
+        this.index = (this.index - 1 + this.photos_urls.length) % this.photos_urls.length;
+        return this.getCurrentPhoto();
+    }
+}
+
 function createCommentElement(comment) {
     const commentElement = document.createElement('div');
     commentElement.className = 'comment';
+
+    all_comments_photos[comment.id] = new Gallery(comment.photos);
 
     const commentContent = `
         <div class="d-flex align-items-start">
@@ -56,7 +81,7 @@ function createCommentElement(comment) {
                 <p><strong>${comment.user}</strong> <span class="text-muted">${comment.created_at}</span></p>
                 <p>${comment.content}</p>
                 <div class="comment-photos">
-                    ${comment.photos.map(photo => `<img src="${photo}" class="comment-photo" alt="Comment Photo" width="200px">`).join('')}
+                    <img src="${comment.photos[0]}" class="comment-photo" alt="" width="200px">
                 </div>
             </div>
         </div>
@@ -82,6 +107,8 @@ function createReplyElement(reply) {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
 
+    all_comments_photos[reply.id] = new Gallery(reply.photos);
+
     const replyContent = `
         <div class="d-flex align-items-start">
             <img src="${reply.avatar}" alt="Avatar" width="30" height="30" style="border-radius: 50%; margin-right: 10px;">
@@ -89,7 +116,7 @@ function createReplyElement(reply) {
                 <p><strong>${reply.user}</strong> <span class="text-muted">${reply.created_at}</span></p>
                 <p>${reply.content}</p>
                 <div class="comment-photos">
-                    ${reply.photos.map(photo => `<img src="${photo}" class="comment-photo" alt="Reply Photo" width="200px">`).join('')}
+                   <img src="${reply.photos[0]}" class="comment-photo" alt="" width="200px">
                 </div>
             </div>
         </div>

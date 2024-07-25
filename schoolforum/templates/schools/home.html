@@ -13,27 +13,24 @@
 <br>
 <div class="row">
     {% for school in schools %}
-    <div class="col-md-6 mb-4">
-        <a href="{% url 'school' school.slug %}" class="text-decoration-none">
-            <div class="card home-card mx-4">
-                <img src="{% if school.photos.all %}{{ school.photos.first.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="School Image">
-                <div class="card-body">
-                    <h5 class="card-title">{{ school.name }}</h5>
-                    <p class="card-text">
-                        {% if school.description|length > 100 %}
-                            {{ school.description|truncatechars:100 }}
-                            <span id="more_text_{{ school.id }}" style="display: none;">{{ school.description|slice:":100" }}</span>
-                        {% else %}
-                            {{ school.description }}
-                        {% endif %}
-                    </p>
+        <div class="col-md-6 mb-4">
+            <a href="{% url 'school' school.slug %}" class="text-decoration-none">
+                <div class="card home-card mx-4">
+                    <img src="{% if school.photos.all %}{{ school.photos.first.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="School Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ school.name }}</h5>
+                        <p class="card-text">
+                            {% if school.description|length > 100 %}
+                                {{ school.description|truncatechars:100 }}
+                                <span id="more_text_{{ school.id }}" style="display: none;">{{ school.description|slice:":100" }}</span>
+                            {% else %}
+                                {{ school.description }}
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
-    {% if forloop.counter|divisibleby:2 %}
-    <div class="w-100"></div>
-    {% endif %}
+            </a>
+        </div>
     {% endfor %}
 </div>
 

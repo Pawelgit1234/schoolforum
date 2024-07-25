@@ -70,24 +70,58 @@ def load_more_discussions(request, slug):
 
 def search(request):
 	query = request.GET.get('q')
-	schools = School.objects.filter(name__icontains=query)
-	discussions = Discussion.objects.filter(title__icontains=query)
 
-	context = {
-		'schools': schools,
-		'discussions': discussions,
-		'query': query,
+	return render(request, 'schools/search_results.html', {'query': query})
+
+
+def load_searched_objects(request):
+	offset = int(request.GET.get('offset', 0))
+	query = request.GET.get('query')
+
+	schools_raw = School.objects.filter(name__contains=query)[offset:offset+10]
+	discussions_raw = Discussion.objects.filter(title__contains=query)[offset:offset+10]
+
+	schools = []
+	discussions = []
+
+	for school in schools_raw:
+		schools.append({
+			"photo_url": school.photos.all()[0].image.url if school.photos.exists() else '',
+			"name": school.name,
+			"description": school.description[:100] + '...',
+			"slug": school.slug,
+		})
+
+	for discussion in discussions_raw:
+		discussions.append({
+			"title": discussion.title,
+			'user': discussion.user.username,
+			'avatar': discussion.user.profile.avatar.url,
+			'created_at': discussion.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+			'lesson_type': discussion.lesson_type,
+			'rating': discussion.overall_rating_balance(),
+			'comments_count': discussion.discussion_comments.count(),
+			'is_closed': discussion.is_closed,
+			'id': discussion.id
+		})
+
+	response = {
+		"schools": schools,
+		"discussions": discussions,
+		"found_count": len(schools) + len(discussions),
 	}
-
-	return render(request, 'schools/search_results.html', context)
-
+	return JsonResponse(response)
 
 def discussion_view(request, id):
 	discussion = get_object_or_404(Discussion, id=id)
 	user = request.user
 
-	arrow_up = discussion.ratings.filter(user=user, is_plus=True).exists()
-	arrow_down = discussion.ratings.filter(user=user, is_plus=False).exists()
+	if user.is_authenticated:
+		arrow_up = discussion.ratings.filter(user=user, is_plus=True).exists()
+		arrow_down = discussion.ratings.filter(user=user, is_plus=False).exists()
+	else:
+		arrow_up = False
+		arrow_down = False
 
 	context = {
 		'discussion': discussion,
